@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  graph:
+    image: demo-graph/graph:latest
+    environment:
+      - PORT=3000
+    expose:
+      - "3000"
+    ports:
+      - "8000:3000"
