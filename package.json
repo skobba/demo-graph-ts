@@ -1,0 +1,30 @@
+{
+  "name": "demo-graph",
+  "version": "1.0.0",
+  "description": "demo-graph",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "start": "NODE_ENV=development ts-node-dev --respawn --no-notify --transpileOnly ./src/index.ts",
+    "prod": "NODE_ENV=production node ./dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skobba/demo-graph.git"
+  },
+  "author": "Gjermund Skobba",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/skobba/demo-graph/issues"
+  },
+  "homepage": "https://github.com/skobba/demo-graph#readme",
+  "devDependencies": {
+    "@types/node": "^12.12.6",
+    "ts-node-dev": "^1.0.0-pre.44",
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1"
+  }
+}
