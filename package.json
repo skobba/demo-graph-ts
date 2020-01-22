@@ -5,7 +5,10 @@
   "scripts": {
     "build": "rm -rf dist && tsc",
     "start": "NODE_ENV=development ts-node-dev --respawn --no-notify --transpileOnly ./src/index.ts",
-    "prod": "NODE_ENV=production node ./dist/index.js"
+    "prod": "NODE_ENV=production node ./dist/index.js",
+    "lint:project": "eslint --ext tsx,ts,jsx,js,json,md,html ./",
+    "lint:project:fix": "eslint --ext tsx,ts,jsx,js,json,md,html ./ --fix",
+    "lint:staged:fix": "eslint --ext tsx,ts,jsx,js,json,md,html ./ --fix"
   },
   "repository": {
     "type": "git",
@@ -19,6 +22,19 @@
   "homepage": "https://github.com/skobba/demo-graph#readme",
   "devDependencies": {
     "@types/node": "^12.12.6",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
+    "eslint": "^6.6.0",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-plugin-html": "^6.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-json": "^2.0.1",
+    "eslint-plugin-markdown": "^1.0.1",
+    "eslint-plugin-prettier": "^3.1.1",
+    "husky": "^4.0.1",
+    "lint-staged": "^9.5.0",
+    "nodemon": "^1.19.4",
+    "prettier": "^1.19.1",
     "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.7.2"
   },
