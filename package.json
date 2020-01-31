@@ -8,7 +8,8 @@
     "prod": "NODE_ENV=production node ./dist/index.js",
     "lint:project": "eslint --ext tsx,ts,jsx,js,json,md,html ./",
     "lint:project:fix": "eslint --ext tsx,ts,jsx,js,json,md,html ./ --fix",
-    "lint:staged:fix": "eslint --ext tsx,ts,jsx,js,json,md,html ./ --fix"
+    "lint:staged:fix": "eslint --ext tsx,ts,jsx,js,json,md,html ./ --fix",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -32,9 +33,11 @@
     "eslint-plugin-markdown": "^1.0.1",
     "eslint-plugin-prettier": "^3.1.1",
     "husky": "^4.0.1",
+    "jest": "^24.9.0",
     "lint-staged": "^9.5.0",
     "nodemon": "^1.19.4",
     "prettier": "^1.19.1",
+    "ts-jest": "^24.3.0",
     "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.7.2"
   },
@@ -45,14 +48,13 @@
     "@types/mongoose": "^5.5.41",
     "mongoose": "^5.8.9",
     "@types/graphql-depth-limit": "^1.1.2",
-    "@types/mongoose": "^5.5.41",
+    "@types/jest": "^24.9.0",
     "apollo-server-express": "^2.9.16",
     "compression": "^1.7.4",
     "@types/compression": "^1.0.1",
     "cors": "^2.8.5",
     "graphql": "^14.5.8",
     "graphql-depth-limit": "^1.1.0",
-    "graphql-tools": "^4.0.6",
-    "mongoose": "^5.8.9"
+    "graphql-tools": "^4.0.6"
   }
 }
