@@ -1,22 +1,14 @@
 import { makeExecutableSchema } from 'graphql-tools';
+import ClientTypeDefs from './clients/typeDef';
+import ClientResolvers from './clients/resolvers';
 import { GraphQLSchema } from 'graphql';
-import { gql } from 'apollo-server-express';
 
-const typeDef = gql`
-  type Query {
-    helloWorld: String!
-  }
-`;
-
-const resolver = {
-  Query: {
-    helloWorld: () => 'Hello!!'
-  }
-};
+import MatterTypeDefs from './matters/typeDef';
+import MatterResolvers from './matters/resolvers';
 
 const schema: GraphQLSchema = makeExecutableSchema({
-  typeDefs: [typeDef],
-  resolvers: [resolver]
+  typeDefs: [ClientTypeDefs, MatterTypeDefs],
+  resolvers: [ClientResolvers, MatterResolvers]
 });
 
 export default schema;
