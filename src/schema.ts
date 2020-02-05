@@ -6,9 +6,12 @@ import { GraphQLSchema } from 'graphql';
 import MatterTypeDefs from './matters/typeDef';
 import MatterResolvers from './matters/resolvers';
 
+import UserTypeDefs from './users/typeDef';
+import UserResolvers from './users/resolvers';
+
 const schema: GraphQLSchema = makeExecutableSchema({
-  typeDefs: [ClientTypeDefs, MatterTypeDefs],
-  resolvers: [ClientResolvers, MatterResolvers]
+  typeDefs: [ClientTypeDefs, MatterTypeDefs, UserTypeDefs],
+  resolvers: [ClientResolvers, MatterResolvers, UserResolvers]
 });
 
 export default schema;

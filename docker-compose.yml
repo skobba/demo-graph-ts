@@ -10,6 +10,8 @@ services:
       - MONGO_USERNAME=demouser
       - MONGO_PASSWORD=demopass
       - MONGO_DATABASENAME=graphdemo
+      - REFRESH_TOKEN_SECRET=somerefreshtokensecret
+      - ACCESS_TOKEN_SECRET=someaccesstokensecret
     expose:
       - "3000"
     ports:

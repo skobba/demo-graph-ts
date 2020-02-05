@@ -3,6 +3,7 @@ import { ApolloServer } from 'apollo-server-express';
 import depthLimit from 'graphql-depth-limit';
 import compression from 'compression';
 import cors from 'cors';
+import { verify } from 'jsonwebtoken';
 import schema from './schema';
 import { setupMongoose } from './db';
 
@@ -32,6 +33,7 @@ class App {
   constructor() {
     setupMongoose();
     this.express = express();
+    this.getUserFromJwt();
     this.setupApollo();
     this.mountRoutes();
   }
@@ -39,6 +41,7 @@ class App {
   private setupApollo(): void {
     const server = new ApolloServer({
       schema,
+      context: ({ req, res }) => ({ req, res }),
       validationRules: [depthLimit(7)],
       playground: true,
       introspection: true
@@ -48,6 +51,28 @@ class App {
     this.express.use(compression());
 
     server.applyMiddleware({ app: this.express, path: '/graphql' });
+  }
+
+  private getUserFromJwt(): void {
+    this.express.post(
+      '/graphql',
+      (req: Request, res: any, next: () => void) => {
+        const authorization = req.headers['authorization'];
+
+        try {
+          const token = authorization.split(' ')[1];
+          const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          console.log('payload: ' + JSON.stringify(payload, null, 2)); // eslint-disable-line no-console
+          req.jwtpayload = payload as JwtDecoded;
+          debugger;
+        } catch (err) {
+          //console.log(err);
+          //throw new Error('not authenticated');
+        }
+
+        next();
+      }
+    );
   }
 
   private mountRoutes(): void {

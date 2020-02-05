@@ -35,3 +35,29 @@ brew services restart mongodb-community
 mongo -u admin -p adminpass admin -port 27018
 mongo -u demouser -p demopass graphdemo -port 27018
 ```
+
+# Users
+## Create User Mution
+````
+  mutation {
+  Register(input:{email: "gjermund@skobba.net", password: "pw", tokenVersion: 1}) {
+    _id
+    email
+    password
+    tokenVersion
+  }
+}
+```
+
+```
+mutation {
+  Login(input:{email: "gjermund@skobba.net", password: "pw"}) {
+    user {
+      _id
+      email
+    	password
+    }
+    accessToken
+  }
+}
+```
