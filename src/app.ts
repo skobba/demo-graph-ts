@@ -5,7 +5,10 @@ import compression from 'compression';
 import cors from 'cors';
 import { verify } from 'jsonwebtoken';
 import schema from './schema';
+import UserModel from './users/model';
 import { setupMongoose } from './db';
+import { sendRefreshToken } from './users/sendRefreshToken';
+import { createAccessToken, createRefreshToken } from './users/auth';
 
 const index = (req: Request, res: Response) => {
   res.status(200).send(`
@@ -77,6 +80,36 @@ class App {
 
   private mountRoutes(): void {
     this.express.get('/', index);
+    this.express.post('/refresh_token', async (req: Request, res: Response) => {
+      const token = req.cookies.jid;
+      if (!token) {
+        return res.send({ ok: false, accessToken: '' });
+      }
+
+      let payload: any = null;
+      try {
+        payload = verify(token, process.env.REFRESH_TOKEN_SECRET);
+      } catch (err) {
+        console.log(err); // eslint-disable-line
+        return res.send({ ok: false, accessToken: '' });
+      }
+
+      // token is valid and
+      // we can send back an access token
+      const user = await UserModel.findOne({ id: payload.userId });
+
+      if (!user) {
+        return res.send({ ok: false, accessToken: '' });
+      }
+
+      if (user.tokenVersion !== payload.tokenVersion) {
+        return res.send({ ok: false, accessToken: '' });
+      }
+
+      sendRefreshToken(res, createRefreshToken(user));
+
+      return res.send({ ok: true, accessToken: createAccessToken(user) });
+    });
   }
 }
 
