@@ -30,15 +30,38 @@ const index = (req: Request, res: Response) => {
     `);
 };
 
+function parseCookies(request: any) {
+  const list = {},
+    rc = request.headers.cookie;
+
+  rc &&
+    rc.split(';').forEach(function(cookie: any) {
+      const parts = cookie.split('=');
+      list[parts.shift().trim()] = decodeURI(parts.join('=')); // eslint-disable-line
+    });
+
+  return list;
+}
+
+const corsOptions = {
+  origin: 'http://localhost:8080',
+  credentials: true,
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
 class App {
   public express: any;
 
   constructor() {
     setupMongoose();
     this.express = express();
+    this.express.use(cors(corsOptions));
+    //const cp = new cookieParser();
+    //this.express.use(cookieParser);
+    //this.express.use(cookieParser('SECRET_GOES_HERE'));
+    this.mountRoutes();
     this.getUserFromJwt();
     this.setupApollo();
-    this.mountRoutes();
   }
 
   private setupApollo(): void {
@@ -50,13 +73,17 @@ class App {
       introspection: true
     });
 
-    this.express.use('*', cors());
     this.express.use(compression());
 
-    server.applyMiddleware({ app: this.express, path: '/graphql' });
+    server.applyMiddleware({
+      app: this.express,
+      path: '/graphql',
+      cors: false
+    });
   }
 
   private getUserFromJwt(): void {
+    console.log('getUserFromJwt'); // eslint-disable-line no-console
     this.express.post(
       '/graphql',
       (req: Request, res: any, next: () => void) => {
@@ -65,7 +92,14 @@ class App {
         try {
           const token = authorization.split(' ')[1];
           const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+          const userId = payload.user.userId;
           console.log('payload: ' + JSON.stringify(payload, null, 2)); // eslint-disable-line no-console
+          console.log('userId: ' + userId); // eslint-disable-line no-console
+
+          UserModel.findOne({ _id: userId }).catch((error: Error) => {
+            throw error;
+          });
+
           req.jwtpayload = payload as JwtDecoded;
           debugger;
         } catch (err) {
@@ -79,8 +113,25 @@ class App {
   }
 
   private mountRoutes(): void {
+    // this.express.use('/graphql', async (req: Request, res: Response) => {
+    //   console.log('intercept'); // eslint-disable-line
+    // });
+
+    this.express.use(function(req, res, next) {
+      console.log('intercept'); // eslint-disable-line
+      const cookies = parseCookies(req);
+
+      console.log('cookies: ' + JSON.stringify(cookies, null, 2));// eslint-disable-line
+      next();
+    });
     this.express.get('/', index);
     this.express.post('/refresh_token', async (req: Request, res: Response) => {
+      //console.log('res: ' + JSON.stringify(res.cookie, null, 2)); // eslint-disable-line
+      const cookies = parseCookies(req);
+
+      console.log('cookies: ' + JSON.stringify(cookies, null, 2));// eslint-disable-line
+
+      console.log('req.cookies: ' + JSON.stringify(req.cookies, null, 2));// eslint-disable-line
       const token = req.cookies.jid;
       if (!token) {
         return res.send({ ok: false, accessToken: '' });

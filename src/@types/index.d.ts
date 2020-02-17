@@ -1,3 +1,4 @@
+import { User } from '../users/model';
 declare global {
   namespace Express {
     interface Request {
@@ -7,6 +8,7 @@ declare global {
 
   export interface JwtDecoded {
     userId: string;
+    //user: User;
     iat: string;
     exp: string;
   }

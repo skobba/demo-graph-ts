@@ -26,9 +26,15 @@ const typeDef = gql`
     accessToken: String!
   }
 
+  type GetAccessTokenResponse {
+    user: User!
+    accessToken: String!
+  }
+
   extend type Mutation {
     Register(input: RegisterInput): User
     Login(input: LoginInput): LoginResponse
+    GetAccessToken: GetAccessTokenResponse
   }
 `;
 

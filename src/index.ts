@@ -1,5 +1,6 @@
-import app from './app';
+//import app from './app';
 import dotenv from 'dotenv';
+import app from './app2';
 import fs from 'fs';
 
 if (process.env.NODE_ENV === 'development') {
