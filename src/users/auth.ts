@@ -8,11 +8,13 @@ export const createAccessToken = (user: User) => {
 };
 
 export const createRefreshToken = (user: User) => {
+  console.log("Set refresh_token to 2d"); // eslint-disable-line
+
   return sign(
     { userId: user._id, tokenVersion: user.tokenVersion },
     process.env.REFRESH_TOKEN_SECRET,
     {
-      expiresIn: '7d'
+      expiresIn: '2d'
     }
   );
 };

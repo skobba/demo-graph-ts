@@ -9,6 +9,8 @@ import UserModel from './users/model';
 import { setupMongoose } from './db';
 import { sendRefreshToken } from './users/sendRefreshToken';
 import { createAccessToken, createRefreshToken } from './users/auth';
+import bodyParser from 'body-parser';
+import { compare } from 'bcryptjs';
 
 const index = (req: Request, res: Response) => {
   res.status(200).send(`
@@ -53,6 +55,9 @@ setupMongoose();
 
 const app = express();
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 app.use(cors(corsOptions));
 
 app.use(compression());
@@ -62,6 +67,69 @@ app.get('/', index);
 app.use('/graphql', async (req: Request, res: Response, next: () => void) => {
   console.log('Intercept all request'); // eslint-disable-line
   next();
+});
+
+app.post('/graphql', (req: Request, res: any, next: () => void) => {
+  try {
+    console.log('Get user from jwt'); // eslint-disable-line no-console
+    const token = req.headers['authorization']; //.split(' ')[1]
+    console.log('Token: ' + token); // eslint-disable-line no-console
+    const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    console.log('payload: ' + JSON.stringify(payload, null, 2)); // eslint-disable-line no-console
+
+    req.jwtpayload = payload as JwtDecoded;
+
+    console.log('req.jwtpayload: ' + JSON.stringify(req.jwtpayload, null, 2)); // eslint-disable-line no-console
+    // UserModel.findOne({ _id: req.jwtpayload.userId })
+    //   .then(user => {
+    //     console.log('user: ' + JSON.stringify(user, null, 2)); // eslint-disable-line no-console
+    //     req.user = user;
+    //   })
+    //   .catch((error: Error) => {
+    //     throw error;
+    //   });
+
+    //console.log('userId: ' + req.jwtpayload.userId); // eslint-disable-line no-console
+
+    debugger;
+  } catch (err) {
+    //console.log(err); // eslint-disable-line no-console
+    console.log('No valid token!!!'); // eslint-disable-line no-console
+    //throw new Error('not authenticated');
+  }
+
+  next();
+});
+
+app.post('/login', async (req: Request, res: Response) => {
+  console.log('login'); // eslint-disable-line
+  console.log('payload: ' + JSON.stringify(req.body, null, 2)); // eslint-disable-line no-console
+  //return res.send({ ok: true, msg: 'melding!' });
+
+  const userFromEmail = await UserModel.findOne({ email: req.body.email });
+
+  if (!userFromEmail) {
+    throw new Error('could not find user');
+  }
+
+  const valid = await compare(req.body.password, userFromEmail.password);
+
+  if (!valid) {
+    throw new Error('bad password');
+  }
+  // login successful
+  console.log('User loged in: ' + userFromEmail.email); // eslint-disable-line
+
+  // create refresh_token
+  const refreshToken = createRefreshToken(userFromEmail);
+
+  // set cookie "jid"
+  sendRefreshToken(res, refreshToken);
+
+  return res.send({
+    user: userFromEmail,
+    accessToken: createAccessToken(userFromEmail)
+  });
 });
 
 app.post('/graphql', (req: Request, res: any, next: () => void) => {
